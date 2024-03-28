@@ -71,9 +71,45 @@ function fetchFiveDayWeather(city) {
         })
 }
 
+function fetchSavedCityWeather(cityName) {
+    let apiKey = 'eb16dd52c0f0133731da86406157045b'; 
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&units=imperial&appid=${apiKey}`)
+        .then(response => response.json())
+        .then(data => {
+            // Update weather information for the saved city
+            document.getElementById('weather-icon').setAttribute('src', `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`);
+            document.getElementById('current-temp').textContent = `${Math.round(data.main.temp)} °F`;
+            document.querySelector('.weather-info').style.display = 'block';
+
+            let highTemp = `${Math.round(data.main.temp_max)}`;
+            let lowTemp = `${Math.round(data.main.temp_min)}`;
+            document.getElementById('high-temp').textContent = highTemp;
+            document.getElementById('low-temp').textContent = lowTemp;
+            document.querySelector('.temp-info').style.display = 'block'; 
+            document.getElementById('city-name').textContent = cityName; 
+        })
+}
+
+document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('remove-btn')) {
+        let listItem = event.target.parentNode;
+        let cityName = listItem.textContent.trim();
+        listItem.remove();
+        
+        // Remove city from favorites list and update weather if it's the currently displayed city
+        if (document.getElementById('city-name').textContent === cityName) {
+            document.querySelector('.weather-info').style.display = 'none'; 
+            document.getElementById('city-name').textContent = ''; 
+        }
+    } else if (event.target.tagName === 'LI') {
+        let cityName = event.target.textContent.trim();
+        fetchSavedCityWeather(cityName);
+    }
+});
+
 
 function isWeekday(day) {
-    return day !== 0 && day !== 6; // Sunday is 0, Saturday is 6
+    return day !== 0 && day !== 6; 
 }
 
 
